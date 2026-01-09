@@ -201,6 +201,7 @@ const initialPeriod = (): PeriodData => ({
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'morning' | 'afternoon' | 'summary'>('morning');
+  const [showPreview, setShowPreview] = useState(false);
   const [report, setReport] = useState<DailyReport>({
     date: new Date().toISOString().split('T')[0],
     employeeName: '',
@@ -291,13 +292,22 @@ const App: React.FC = () => {
               <span className="p-2.5 bg-blue-600 rounded-2xl text-white shadow-lg shadow-blue-100">👕</span>
               校园洗涤报表系统
             </h1>
-            <button
-              onClick={exportPDF}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-black shadow-lg shadow-blue-200 active:scale-95 transition-all flex items-center gap-2"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-              导出报表PDF
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowPreview(true)}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-2xl font-black shadow-lg shadow-emerald-200 active:scale-95 transition-all flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                查看报表
+              </button>
+              <button
+                onClick={exportPDF}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-black shadow-lg shadow-blue-200 active:scale-95 transition-all flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                导出报表PDF
+              </button>
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-3xl border border-slate-200">
             <div>
@@ -429,19 +439,19 @@ const App: React.FC = () => {
           <h2 className="text-xl font-bold bg-gray-100 px-4 py-2 border-b border-black">上午时段 (Morning)</h2>
           <div className="p-4 space-y-4">
             <div>
-              <h3 className="font-bold underline mb-1">一、衣物收发与统计</h3>
+              <h3 className="font-bold mb-1">一、衣物收发与统计</h3>
               <p className="pl-4">学生收衣: 衣物({report.morning.in.student.clothes}), 鞋靴({report.morning.in.student.shoes}), 床上用品({report.morning.in.student.bedding}) - 共 <span className="font-bold">{calculateSum(report.morning.in.student)}</span> 件</p>
               <p className="pl-4">职工收衣: 衣物({report.morning.in.staff.clothes}), 鞋靴({report.morning.in.staff.shoes}), 床上用品({report.morning.in.staff.bedding}) - 共 <span className="font-bold">{calculateSum(report.morning.in.staff)}</span> 件</p>
               <p className="pl-4">发衣统计: 学生 <span className="font-bold">{report.morning.out.student}</span> 件 / 职工 <span className="font-bold">{report.morning.out.staff}</span> 件 (异常说明: {report.morning.out.failedReason || '无'})</p>
             </div>
             <div>
-              <h3 className="font-bold underline mb-1">二、工作及反馈</h3>
+              <h3 className="font-bold mb-1">二、工作及反馈</h3>
               <p className="pl-4">任务内容: {report.morning.tasks || '无'}</p>
               <p className="pl-4">正面反馈: {report.morning.feedback.positive || '无'}</p>
               <p className="pl-4">问题建议: {report.morning.feedback.issues || '无'}</p>
             </div>
             <div>
-              <h3 className="font-bold underline mb-1">三、遇到问题及处理</h3>
+              <h3 className="font-bold mb-1">三、遇到问题及处理</h3>
               <p className="pl-4 whitespace-pre-wrap">{report.morning.problems || '无'}</p>
             </div>
           </div>
@@ -451,11 +461,21 @@ const App: React.FC = () => {
         <div className="mb-8 border border-black rounded-lg overflow-hidden">
           <h2 className="text-xl font-bold bg-gray-100 px-4 py-2 border-b border-black">下午时段 (Afternoon)</h2>
           <div className="p-4 space-y-4">
-            <p className="font-bold">下午收衣量: {calculateSum(report.afternoon.in.student) + calculateSum(report.afternoon.in.staff)} 件 / 发衣量: {report.afternoon.out.student + report.afternoon.out.staff} 件</p>
             <div>
-              <h3 className="font-bold underline mb-1">工作内容及反馈</h3>
-              <p className="pl-4 whitespace-pre-wrap">{report.afternoon.tasks || '无'}</p>
-              <p className="pl-4 italic">遇到问题: {report.afternoon.problems || '无'}</p>
+              <h3 className="font-bold mb-1">一、衣物收发与统计</h3>
+              <p className="pl-4">学生收衣: 衣物({report.afternoon.in.student.clothes}), 鞋靴({report.afternoon.in.student.shoes}), 床上用品({report.afternoon.in.student.bedding}) - 共 <span className="font-bold">{calculateSum(report.afternoon.in.student)}</span> 件</p>
+              <p className="pl-4">职工收衣: 衣物({report.afternoon.in.staff.clothes}), 鞋靴({report.afternoon.in.staff.shoes}), 床上用品({report.afternoon.in.staff.bedding}) - 共 <span className="font-bold">{calculateSum(report.afternoon.in.staff)}</span> 件</p>
+              <p className="pl-4">发衣统计: 学生 <span className="font-bold">{report.afternoon.out.student}</span> 件 / 职工 <span className="font-bold">{report.afternoon.out.staff}</span> 件 (异常说明: {report.afternoon.out.failedReason || '无'})</p>
+            </div>
+            <div>
+              <h3 className="font-bold mb-1">二、工作及反馈</h3>
+              <p className="pl-4">任务内容: {report.afternoon.tasks || '无'}</p>
+              <p className="pl-4">正面反馈: {report.afternoon.feedback.positive || '无'}</p>
+              <p className="pl-4">问题建议: {report.afternoon.feedback.issues || '无'}</p>
+            </div>
+            <div>
+              <h3 className="font-bold mb-1">三、遇到问题及处理</h3>
+              <p className="pl-4 whitespace-pre-wrap">{report.afternoon.problems || '无'}</p>
             </div>
           </div>
         </div>
@@ -464,10 +484,10 @@ const App: React.FC = () => {
         <div className="mt-8 pt-6">
           <h2 className="text-2xl font-bold mb-4 border-l-4 border-black pl-3">全日汇总总结</h2>
           <div className="flex border border-black mb-6 bg-gray-50">
-            <div className="flex-1 p-4 border-r border-black"><span className="font-bold">全日收衣总数:</span> <span className="text-lg underline">{totals.totalIn}</span> 件</div>
-            <div className="flex-1 p-4"><span className="font-bold">全日发衣总数:</span> <span className="text-lg underline">{totals.totalOut}</span> 件</div>
+            <div className="flex-1 p-4 border-r border-black"><span className="font-bold">全日收衣总数:</span> <span className="text-lg">{totals.totalIn}</span> 件</div>
+            <div className="flex-1 p-4"><span className="font-bold">全日发衣总数:</span> <span className="text-lg">{totals.totalOut}</span> 件</div>
           </div>
-          <h3 className="font-bold text-lg mb-2 underline">明日工作计划 / 改进建议：</h3>
+          <h3 className="font-bold text-lg mb-2">明日工作计划 / 改进建议：</h3>
           <div className="min-h-[120px] border border-gray-300 p-4 whitespace-pre-wrap leading-relaxed rounded">
             {report.summary.tomorrowPlan || '按计划进行常规服务。'}
           </div>
@@ -478,6 +498,126 @@ const App: React.FC = () => {
           <span>生成日期：{new Date().toLocaleString()}</span>
         </div>
       </div>
+
+      {/* Preview Modal */}
+      {showPreview && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+          onClick={() => setShowPreview(false)}
+        >
+          <div 
+            className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-auto relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="sticky top-0 bg-white border-b-2 border-slate-200 px-6 py-4 flex items-center justify-between z-10">
+              <h2 className="text-2xl font-black text-slate-900">报表预览</h2>
+              <button
+                onClick={() => setShowPreview(false)}
+                className="text-slate-500 hover:text-slate-700 transition-colors p-2 hover:bg-slate-100 rounded-xl"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-8">
+              <div 
+                id="report-preview" 
+                className="bg-white text-black p-12 leading-relaxed mx-auto" 
+                style={{ width: '210mm', minHeight: '297mm', fontSize: '13px', fontFamily: 'SimSun, "STSong", serif' }}
+              >
+                <h1 className="text-3xl font-bold text-center mb-8 pb-4 border-b-4 border-double border-black">校园洗涤服务员工日报表</h1>
+                
+                <div className="flex justify-between mb-8 pb-2 font-bold text-lg border-b border-black">
+                  <div style={{ width: '50%' }}>日期：{report.date}</div>
+                  <div style={{ width: '50%', textAlign: 'right' }}>员工姓名：{report.employeeName || '___________'}</div>
+                </div>
+
+                {/* Morning Section in PDF */}
+                <div className="mb-8 border border-black rounded-lg overflow-hidden">
+                  <h2 className="text-xl font-bold bg-gray-100 px-4 py-2 border-b border-black">上午时段 (Morning)</h2>
+                  <div className="p-4 space-y-4">
+                    <div>
+                      <h3 className="font-bold mb-1">一、衣物收发与统计</h3>
+                      <p className="pl-4">学生收衣: 衣物({report.morning.in.student.clothes}), 鞋靴({report.morning.in.student.shoes}), 床上用品({report.morning.in.student.bedding}) - 共 <span className="font-bold">{calculateSum(report.morning.in.student)}</span> 件</p>
+                      <p className="pl-4">职工收衣: 衣物({report.morning.in.staff.clothes}), 鞋靴({report.morning.in.staff.shoes}), 床上用品({report.morning.in.staff.bedding}) - 共 <span className="font-bold">{calculateSum(report.morning.in.staff)}</span> 件</p>
+                      <p className="pl-4">发衣统计: 学生 <span className="font-bold">{report.morning.out.student}</span> 件 / 职工 <span className="font-bold">{report.morning.out.staff}</span> 件 (异常说明: {report.morning.out.failedReason || '无'})</p>
+                    </div>
+                    <div>
+                      <h3 className="font-bold mb-1">二、工作及反馈</h3>
+                      <p className="pl-4">任务内容: {report.morning.tasks || '无'}</p>
+                      <p className="pl-4">正面反馈: {report.morning.feedback.positive || '无'}</p>
+                      <p className="pl-4">问题建议: {report.morning.feedback.issues || '无'}</p>
+                    </div>
+                    <div>
+                      <h3 className="font-bold mb-1">三、遇到问题及处理</h3>
+                      <p className="pl-4 whitespace-pre-wrap">{report.morning.problems || '无'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Afternoon Section in PDF */}
+                <div className="mb-8 border border-black rounded-lg overflow-hidden">
+                  <h2 className="text-xl font-bold bg-gray-100 px-4 py-2 border-b border-black">下午时段 (Afternoon)</h2>
+                  <div className="p-4 space-y-4">
+                    <div>
+                      <h3 className="font-bold mb-1">一、衣物收发与统计</h3>
+                      <p className="pl-4">学生收衣: 衣物({report.afternoon.in.student.clothes}), 鞋靴({report.afternoon.in.student.shoes}), 床上用品({report.afternoon.in.student.bedding}) - 共 <span className="font-bold">{calculateSum(report.afternoon.in.student)}</span> 件</p>
+                      <p className="pl-4">职工收衣: 衣物({report.afternoon.in.staff.clothes}), 鞋靴({report.afternoon.in.staff.shoes}), 床上用品({report.afternoon.in.staff.bedding}) - 共 <span className="font-bold">{calculateSum(report.afternoon.in.staff)}</span> 件</p>
+                      <p className="pl-4">发衣统计: 学生 <span className="font-bold">{report.afternoon.out.student}</span> 件 / 职工 <span className="font-bold">{report.afternoon.out.staff}</span> 件 (异常说明: {report.afternoon.out.failedReason || '无'})</p>
+                    </div>
+                    <div>
+                      <h3 className="font-bold mb-1">二、工作及反馈</h3>
+                      <p className="pl-4">任务内容: {report.afternoon.tasks || '无'}</p>
+                      <p className="pl-4">正面反馈: {report.afternoon.feedback.positive || '无'}</p>
+                      <p className="pl-4">问题建议: {report.afternoon.feedback.issues || '无'}</p>
+                    </div>
+                    <div>
+                      <h3 className="font-bold mb-1">三、遇到问题及处理</h3>
+                      <p className="pl-4 whitespace-pre-wrap">{report.afternoon.problems || '无'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Final Summary in PDF */}
+                <div className="mt-8 pt-6">
+                  <h2 className="text-2xl font-bold mb-4 border-l-4 border-black pl-3">全日汇总总结</h2>
+                  <div className="flex border border-black mb-6 bg-gray-50">
+                    <div className="flex-1 p-4 border-r border-black"><span className="font-bold">全日收衣总数:</span> <span className="text-lg">{totals.totalIn}</span> 件</div>
+                    <div className="flex-1 p-4"><span className="font-bold">全日发衣总数:</span> <span className="text-lg">{totals.totalOut}</span> 件</div>
+                  </div>
+                  <h3 className="font-bold text-lg mb-2">明日工作计划 / 改进建议：</h3>
+                  <div className="min-h-[120px] border border-gray-300 p-4 whitespace-pre-wrap leading-relaxed rounded">
+                    {report.summary.tomorrowPlan || '按计划进行常规服务。'}
+                  </div>
+                </div>
+
+                <div className="mt-16 flex justify-between italic text-sm border-t border-gray-400 pt-4 opacity-75">
+                  <span>系统生成报表 - 校园洗涤服务管理系统</span>
+                  <span>生成日期：{new Date().toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+            <div className="sticky bottom-0 bg-white border-t-2 border-slate-200 px-6 py-4 flex justify-end gap-3">
+              <button
+                onClick={() => setShowPreview(false)}
+                className="px-6 py-2 border-2 border-slate-300 text-slate-700 rounded-xl font-bold hover:bg-slate-50 transition-colors"
+              >
+                关闭
+              </button>
+              <button
+                onClick={() => {
+                  setShowPreview(false);
+                  exportPDF();
+                }}
+                className="px-6 py-2 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-colors"
+              >
+                导出PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

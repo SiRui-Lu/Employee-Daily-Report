@@ -9,6 +9,10 @@ export default defineConfig(({ mode }) => {
         port: 3000,
         host: '0.0.0.0',
       },
+      build: {
+        emptyOutDir: true, // 构建前清空输出目录
+        base: './', // 使用相对路径，确保在 Electron 中能正确加载资源
+      },
       plugins: [react()],
       define: {
         'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
