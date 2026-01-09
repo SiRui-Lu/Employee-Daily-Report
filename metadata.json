@@ -1,0 +1,7 @@
+{
+  "name": "校园洗涤员工日报系统",
+  "description": "为中学校园洗涤服务量身定制的员工日报提交与管理系统，支持AI日报汇总分析。",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
